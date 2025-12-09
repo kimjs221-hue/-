@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>의료관계법규 게임 모드 퀴즈</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #222b45, #050814);
+      color: #f7f9fc;
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 16px;
+    }
+    .app {
+      width: 100%;
+      max-width: 1100px;
+      background: rgba(8, 10, 26, 0.96);
+      border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: linear-gradient(90deg, #141e30, #243b55);
+    }
+    header .title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    header h1 span.badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffdd57;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    header p {
+      font-size: 11px;
+      color: #cbd5f5;
+      opacity: 0.9;
+    }
+    .mode-toggle {
+      display: inline-flex;
+      padding: 2px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.35);
+    }
+    .mode-toggle button {
+      border: none;
+      background: transparent;
+      color: #cbd5ff;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      min-width: 70px;
+      transition: 0.18s ease;
+    }
+    .mode-toggle button.active {
+      background: #ff4f6a;
+      color: #fff;
+      box-shadow: 0 0 12px rgba(255, 79, 106, 0.6);
+    }
+    .layout {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+    .left-pane {
+      flex: 2.2;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .right-pane {
+      flex: 1.2;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: radial-gradient(circle at top left, #111827, #020617);
+    }
+    .panel {
+      background: radial-gradient(circle at top left, #10152d, #050817);
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .panel-header h2 {
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .chip {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #9ca3ff;
+    }
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    select, button, input[type="text"] {
+      font-family: inherit;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 255, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 12px;
+      padding: 6px 10px;
+      outline: none;
+    }
+    select {
+      padding-right: 26px;
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, #9ca3ff 50%),
+        linear-gradient(135deg, #9ca3ff 50%, transparent 50%);
+      background-position: calc(100% - 12px) 9px, calc(100% - 7px) 9px;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+    }
+    button {
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+    button.primary {
+      background: linear-gradient(135deg, #ff4f6a, #ff914d);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 6px 16px rgba(248, 113, 113, 0.6);
+    }
+    button.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 9px 22px rgba(248, 113, 113, 0.8);
+    }
+    button.secondary {
+      border-color: rgba(148, 163, 255, 0.8);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+    }
+    button.secondary:hover {
+      background: rgba(30, 64, 175, 0.7);
+    }
+    button:disabled {
+      opacity: 0.55;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+    #questionMeta {
+      font-size: 11px;
+      color: #9ca3ff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    #questionText {
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    ul.options {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .option-item {
+      border-radius: 10px;
+      padding: 7px 9px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 255, 0.5);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+    .option-item.correct {
+      border-color: #4ade80;
+      background: rgba(34, 197, 94, 0.12);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.4);
+    }
+    .option-item.wrong {
+      border-color: #fb7185;
+      background: rgba(248, 113, 113, 0.12);
+      box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.4);
+    }
+    .option-label {
+      flex-shrink: 0;
+      font-weight: 600;
+      color: #c7d2fe;
+      min-width: 16px;
+    }
+    .option-text {
+      flex: 1;
+    }
+    .option-item input {
+      margin-top: 3px;
+      accent-color: #ff4f6a;
+    }
+    .answer-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    #recallInput {
+      flex: 1;
+    }
+    #feedback {
+      font-size: 12px;
+      min-height: 18px;
+    }
+    #feedback.correct {
+      color: #4ade80;
+    }
+    #feedback.wrong {
+      color: #fb7185;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .stat-card {
+      background: radial-gradient(circle at top, #020617, #020617);
+      border-radius: 10px;
+      padding: 6px 8px;
+      border: 1px solid rgba(148, 163, 255, 0.4);
+      font-size: 11px;
+    }
+    .stat-label {
+      opacity: 0.7;
+      margin-bottom: 2px;
+    }
+    .stat-value {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 6px;
+    }
+    .tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 255, 0.4);
+      white-space: nowrap;
+    }
+    .wrong-list {
+      max-height: 250px;
+      overflow-y: auto;
+      margin-top: 6px;
+      padding-right: 4px;
+    }
+    .wrong-item {
+      font-size: 11px;
+      padding: 6px 6px;
+      border-radius: 8px;
+      margin-bottom: 4px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(248, 113, 113, 0.6);
+    }
+    .wrong-item strong {
+      color: #fecaca;
+    }
+    .mini {
+      font-size: 10px;
+      opacity: 0.7;
+    }
+    @media (max-width: 820px) {
+      .layout {
+        flex-direction: column;
+      }
+      .left-pane {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 16px;
+      }
+      .panel {
+        padding: 10px 11px;
+      }
+      #questionText {
+        font-size: 14px;
+      }
+      .option-item {
+        font-size: 12px;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title-group">
+        <h1>
+          의료관계법규 문제은행
+          <span class="badge">게임 모드</span>
+        </h1>
+        <p>장애인복지법 · 노인복지법 · 국민건강보험법 파트별 학습</p>
+      </div>
+      <div class="mode-toggle">
+        <button id="modeQuiz" class="active">객관식 퀴즈</button>
+        <button id="modeRecall">암기 모드</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div class="left-pane">
+        <div class="panel">
+          <div class="panel-header">
+            <h2>🎮 문제 영역</h2>
+            <span class="chip" id="categoryChip">전체 파트</span>
+          </div>
+
+          <div class="controls-row">
+            <select id="categorySelect">
+              <option value="ALL">전체 파트</option>
+              <option value="장애인복지법">장애인복지법</option>
+              <option value="노인복지법">노인복지법</option>
+              <option value="국민건강보험법">국민건강보험법</option>
+            </select>
+            <button class="secondary" id="shuffleBtn">섞어서 다시 시작</button>
+          </div>
+
+          <div id="questionMeta">
+            <span id="qIndex">문제 0 / 0</span>
+            <span id="qInfo">난이도 : 국시</span>
+          </div>
+
+          <div id="questionText"></div>
+          <ul class="options" id="optionsList"></ul>
+
+          <div class="answer-row" id="recallRow" style="display:none;">
+            <input type="text" id="recallInput" placeholder="키워드 입력 (정답 전체 말고 핵심어만 써도 인정)" />
+            <button class="secondary" id="recallCheckBtn">체크</button>
+          </div>
+
+          <div class="controls-row">
+            <button class="primary" id="checkBtn">정답 확인</button>
+            <button class="secondary" id="nextBtn" disabled>다음 문제</button>
+          </div>
+
+          <div id="feedback"></div>
+        </div>
+      </div>
+
+      <div class="right-pane">
+        <div class="panel">
+          <div class="panel-header">
+            <h2>📊 진행 상황</h2>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">진행률</div>
+              <div class="stat-value" id="statProgress">0%</div>
+              <div class="mini" id="statCount">0 / 0문제</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">정답률</div>
+              <div class="stat-value" id="statAccuracy">0%</div>
+              <div class="mini" id="statScore">0점</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">연속 정답</div>
+              <div class="stat-value" id="statCombo">0</div>
+              <div class="mini" id="statBestCombo">최고 0연속</div>
+            </div>
+          </div>
+
+          <div class="tag-row">
+            <span class="tag">국가고시 난이도</span>
+            <span class="tag">파트 선택 학습</span>
+            <span class="tag">오답 자동 저장</span>
+            <span class="tag">암기모드 키워드 인식</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2>📚 오답 노트</h2>
+          </div>
+          <div class="mini">틀린 문제들이 자동으로 쌓입니다.</div>
+          <div class="wrong-list" id="wrongList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== 문제은행 (네가 보내준 내용으로만 구성) =====
+    const questionBank = [
+      // 장애인복지법
+      {
+        id: 1,
+        category: "장애인복지법",
+        question: "장애인복지법의 목적으로 가장 옳은 것은?",
+        options: [
+          "장애인의 의료서비스 확대만을 목적으로 한다.",
+          "장애인의 소득보장을 위한 연금 지급만을 목적으로 한다.",
+          "장애인의 사회활동 참여증진을 통한 사회통합에 이바지한다.",
+          "장애인의 취업지원과 직업훈련만을 목적으로 한다.",
+          "장애인단체의 권익옹호를 위한 지원만을 목적으로 한다."
+        ],
+        answer: 3,
+        explanation: "장애인복지법의 목적은 장애인의 복지와 사회활동 참여 증진을 통해 사회통합에 이바지하는 것이다.",
+        keywords: ["장애인복지법", "목적", "사회활동 참여증진", "사회통합"]
+      },
+      {
+        id: 2,
+        category: "장애인복지법",
+        question:
+          "장애인의 기본이념으로 옳은 것은?\n\n“장애인복지의 기본이념은 장애인의 완전한 (  )와 (  )을 통하여 사회통합을 실현하는 것이다.”\n\n괄호 안에 들어갈 가장 알맞은 말의 조합은?",
+        options: [
+          "자립 · 소득보장",
+          "재활 · 교육",
+          "사회참여 · 평등",
+          "의료보장 · 주거보장",
+          "보호 · 선별"
+        ],
+        answer: 3,
+        explanation: "장애인복지의 기본이념은 장애인의 완전한 사회참여와 평등을 통하여 사회통합을 실현하는 것이다.",
+        keywords: ["기본이념", "사회참여", "평등", "사회통합"]
+      },
+      {
+        id: 3,
+        category: "장애인복지법",
+        question:
+          "장애인정책 종합계획의 목적으로 옳은 것은?\n\n“장애인의 (  )과 (  )를 위하여 장애인정책 종합계획을 수립·시행한다.”\n\n괄호 안에 들어갈 알맞은 말의 조합은?",
+        options: [
+          "건강 · 의료",
+          "교육 · 고용",
+          "권익 · 복지증진",
+          "문화 · 여가",
+          "거주 · 이동편의"
+        ],
+        answer: 3,
+        explanation: "장애인정책 종합계획은 장애인의 권익과 복지증진을 위하여 수립·시행된다.",
+        keywords: ["장애인정책", "종합계획", "권익", "복지증진"]
+      },
+      {
+        id: 4,
+        category: "장애인복지법",
+        question: "장애인복지법상 장애인의 기준에 따른 장애유형에 해당하지 않는 것은?",
+        options: [
+          "시각장애인",
+          "청각장애인",
+          "지체장애인",
+          "지적장애인",
+          "알레르기장애인"
+        ],
+        answer: 5,
+        explanation: "장애인복지법상 법정 장애유형에는 시각·청각·지체·지적장애 등은 포함되나, ‘알레르기장애’라는 유형은 없다.",
+        keywords: ["장애유형", "비해당", "알레르기장애"]
+      },
+      {
+        id: 5,
+        category: "장애인복지법",
+        question: "장애인 자동차 표지의 발급권자로 옳은 것은?",
+        options: [
+          "보건복지부장관",
+          "시·도지사",
+          "시·군·구청장",
+          "경찰서장",
+          "국민연금공단 이사장"
+        ],
+        answer: 3,
+        explanation: "장애인 자동차 표지는 관할 시·군·구청장이 발급한다.",
+        keywords: ["장애인 자동차 표지", "발급권자", "시군구청장"]
+      },
+
+      // 노인복지법
+      {
+        id: 6,
+        category: "노인복지법",
+        question: "다음 중 노인성질환에 해당하는 것으로 옳은 것은?",
+        options: [
+          "급성 충수염",
+          "안질환",
+          "급성 편도선염",
+          "장티푸스",
+          "급성 기관지염"
+        ],
+        answer: 2,
+        explanation: "노인복지법에서 규정하는 노인성질환에는 안질환, 무릎관절증, 전립선질환 등이 포함된다.",
+        keywords: ["노인성질환", "안질환", "무릎관절증", "전립선질환"]
+      },
+      {
+        id: 7,
+        category: "노인복지법",
+        question: "다음 중 노인학대에 포함되지 않는 것은?",
+        options: [
+          "노인에게 폭언을 하여 정서적 고통을 주는 행위",
+          "노인을 장시간 방임하여 돌보지 않는 행위",
+          "노인의 재산을 무단으로 사용하는 행위",
+          "노인에게 신체적 상해를 가하는 행위",
+          "노인의 의사를 존중하여 필요한 설명 후 동의하에 치료하는 행위"
+        ],
+        answer: 5,
+        explanation: "노인학대는 신체적·정신적·정서적·성적 폭력 및 방임, 경제적 착취 등이지만, 노인의 의사를 존중한 정상적인 치료는 학대가 아니다.",
+        keywords: ["노인학대", "포함되지 않는 것", "정상적 치료"]
+      },
+      {
+        id: 8,
+        category: "노인복지법",
+        question: "노인실태조사는 몇 년마다 실시하는가?",
+        options: [
+          "매년 1회",
+          "2년마다",
+          "3년마다",
+          "4년마다",
+          "5년마다"
+        ],
+        answer: 3,
+        explanation: "노인실태조사는 보건복지부장관이 3년마다 실시한다.",
+        keywords: ["노인실태조사", "주기", "3년마다"]
+      },
+      {
+        id: 9,
+        category: "노인복지법",
+        question:
+          "지역사회 등에서 노인 일자리의 개발·지원, 창업·육성 및 노인에 의한 재화의 생산·판매 등을 직접 담당하는 기관으로 옳은 것은?",
+        options: [
+          "노인복지관",
+          "노인보호전문기관",
+          "노인일자리지원기관",
+          "경로당",
+          "노인요양시설"
+        ],
+        answer: 3,
+        explanation: "지역사회에서 노인 일자리 개발·지원, 창업·육성 및 재화의 생산·판매 등을 직접 담당하는 기관은 노인일자리지원기관이다.",
+        keywords: ["노인일자리", "노인일자리지원기관"]
+      },
+      {
+        id: 10,
+        category: "노인복지법",
+        question: "노인건강진단을 실시하는 기관으로 옳지 않은 것은?",
+        options: [
+          "국·공립병원",
+          "보건소",
+          "노인복지법에 따른 건강진단기관",
+          "보건소장이 지정한 의료기관",
+          "약국"
+        ],
+        answer: 5,
+        explanation: "약국은 요양기관에는 해당되지만, 노인복지법상 건강진단기관은 아니다.",
+        keywords: ["노인건강진단", "건강진단기관", "약국 아님"]
+      },
+      {
+        id: 11,
+        category: "노인복지법",
+        question:
+          "지역노인들이 자율적으로 친목도모, 취미활동, 공동작업장 운영 등의 활동을 할 수 있도록 하는 시설은?",
+        options: [
+          "노인복지관",
+          "경로당",
+          "노인교실",
+          "노인요양시설",
+          "노인요양공동생활가정"
+        ],
+        answer: 2,
+        explanation: "경로당은 지역노인들이 자율적으로 친목도모, 취미활동 등을 하는 시설이다.",
+        keywords: ["경로당", "여가복지시설"]
+      },
+      {
+        id: 12,
+        category: "노인복지법",
+        question: "노인관련 기관에 대한 취업제한 기간은 몇 년을 초과할 수 없는가?",
+        options: [
+          "3년",
+          "5년",
+          "7년",
+          "10년",
+          "15년"
+        ],
+        answer: 4,
+        explanation: "노인학대·성범죄 가해자의 노인 관련 기관 취업제한 기간은 10년을 초과할 수 없다.",
+        keywords: ["노인학대", "취업제한", "10년"]
+      },
+      {
+        id: 13,
+        category: "노인복지법",
+        question:
+          "노인의 생업지원과 관련하여 국가 또는 지방자치단체가 청소·주차관리·매표 등의 사업을 위탁할 때 우선적으로 고려해야 할 사항으로 옳은 것은?",
+        options: [
+          "60세 이상 노인만 채용하는 사업체를 우선한다.",
+          "65세 이상 노인을 10% 이상 채용한 모든 사업체를 우선한다.",
+          "연령과 관계없이 장애인을 10% 이상 고용한 사업체를 우선한다.",
+          "65세 이상 노인 20% 이상을 채용한 사업체를 우선 고려한다.",
+          "70세 이상 노인 50% 이상을 채용한 사업체만을 대상으로 한다."
+        ],
+        answer: 4,
+        explanation: "노인의 생업지원을 위해 청소·주차관리·매표 등의 사업을 위탁할 때 65세 이상 노인을 20% 이상 채용한 사업체를 우선 고려한다.",
+        keywords: ["노인의 생업지원", "65세 이상", "20% 이상"]
+      },
+      {
+        id: 14,
+        category: "노인복지법",
+        question: "노인복지법의 목적으로 가장 옳은 것은?",
+        options: [
+          "노인의 근로기회를 확대하여 국가경제 발전에 이바지한다.",
+          "노인의 질환 예방과 생활안정을 통하여 노인의 보건복지 증진에 이바지한다.",
+          "노인의 재산보호를 통하여 경제적 복지에만 기여한다.",
+          "노인의 의료비를 전액 국가가 부담하도록 하는 데 목적이 있다.",
+          "노인의 여가활동만을 지원하는 데 목적이 있다."
+        ],
+        answer: 2,
+        explanation: "노인복지법의 목적은 노인의 질환 예방과 생활안정을 통하여 노인의 보건복지 증진에 이바지하는 것이다.",
+        keywords: ["노인복지법", "목적", "보건복지증진"]
+      },
+
+      // 국민건강보험법
+      {
+        id: 15,
+        category: "국민건강보험법",
+        question: "국민건강보험법의 목적으로 가장 옳은 것은?",
+        options: [
+          "국민의 세부담을 줄이는 것을 유일한 목적으로 한다.",
+          "의료인의 소득을 보장하는 것을 목적으로 한다.",
+          "국민보건 향상과 사회보장 증진에 이바지함을 목적으로 한다.",
+          "민간보험회사의 경쟁력 강화를 목적으로 한다.",
+          "의료기관의 수익 증대를 유일한 목적으로 한다."
+        ],
+        answer: 3,
+        explanation: "국민건강보험법의 목적은 국민보건 향상과 사회보장 증진에 이바지하는 것이다.",
+        keywords: ["국민건강보험법", "목적", "국민보건 향상", "사회보장 증진"]
+      },
+      {
+        id: 16,
+        category: "국민건강보험법",
+        question: "건강보험을 받을 수 있는 자로 옳게 묶인 것은?",
+        options: [
+          "직장가입자와 직장가입자의 피부양자",
+          "외국인 관광객과 그 동반가족",
+          "해외에 거주하는 모든 교포",
+          "민간보험 가입자와 그 피부양자",
+          "산업재해보상보험의 수급권자"
+        ],
+        answer: 1,
+        explanation: "건강보험의 적용대상에는 직장가입자와 그 피부양자, 지역가입자 등이 포함되며, 보기 1이 옳은 조합이다.",
+        keywords: ["건강보험", "직장가입자", "피부양자"]
+      },
+      {
+        id: 17,
+        category: "국민건강보험법",
+        question: "다음 중 국민건강보험 종합계획에 포함되는 사항이 아닌 것은?",
+        options: [
+          "보험급여의 범위 및 수준에 관한 사항",
+          "보험 재정의 운영 및 안정화 방안",
+          "보험료 부과 및 징수에 관한 기본방향",
+          "국가의 외교·안보 정책 방향",
+          "건강보험 제도의 중장기 발전방향"
+        ],
+        answer: 4,
+        explanation: "국민건강보험 종합계획은 건강보험 제도 운영과 관련된 사항을 다루며, 국가의 외교·안보 정책 방향은 포함되지 않는다.",
+        keywords: ["건강보험", "종합계획", "포함되지 않는 것"]
+      },
+      {
+        id: 18,
+        category: "국민건강보험법",
+        question: "건강보험정책은 어느 기관의 심의를 거쳐 의결되는가?",
+        options: [
+          "국무회의",
+          "보건복지위원회",
+          "국민건강보험공단 이사회",
+          "건강보험정책심의위원회",
+          "보건복지부 공무원노조위원회"
+        ],
+        answer: 4,
+        explanation: "건강보험정책은 보건복지부장관 소속 건강보험정책심의위원회의 심의를 거쳐 의결된다.",
+        keywords: ["건강보험정책", "건강보험정책심의위원회"]
+      },
+      {
+        id: 19,
+        category: "국민건강보험법",
+        question: "다음 중 건강보험의 보험급여에 해당하지 않는 것은?",
+        options: [
+          "질병·부상에 대한 진찰 및 검사",
+          "입원 및 간호에 필요한 비용",
+          "산업재해보상보험법에 따라 보상받는 업무상 재해에 대한 진료비",
+          "약국에서 조제받는 처방약 비용의 일부",
+          "의사가 필요하다고 인정한 수술 및 처치"
+        ],
+        answer: 3,
+        explanation: "업무상 재해에 대한 진료비는 주로 산업재해보상보험에서 보상하며, 건강보험 보험급여에 해당하지 않는다.",
+        keywords: ["보험급여", "해당하지 않는 것", "산재"]
+      },
+      {
+        id: 20,
+        category: "국민건강보험법",
+        question: "직장가입자와 직장가입자의 피부양자를 제외한 가입자를 무엇이라고 하는가?",
+        options: [
+          "특수가입자",
+          "지역가입자",
+          "임의가입자",
+          "피보험자",
+          "피부양자"
+        ],
+        answer: 2,
+        explanation: "직장가입자와 그 피부양자를 제외한 가입자는 지역가입자이다.",
+        keywords: ["지역가입자", "직장가입자 제외"]
+      },
+      {
+        id: 21,
+        category: "국민건강보험법",
+        question: "초과본인일부담금 제도에 대한 설명으로 가장 옳은 것은?",
+        options: [
+          "본인일부부담금은 언제나 한도 없이 전액 가입자가 부담한다.",
+          "소득이 높은 가입자에게만 적용되는 제도이다.",
+          "일정 기간 동안 본인일부부담금 합계가 상한액을 넘으면 초과분은 공단이 부담하거나 환급한다.",
+          "요양기관이 부담해야 하는 비용이 일정액을 초과했을 때 적용되는 제도이다.",
+          "의료인의 보수를 일정 수준으로 보장하기 위한 제도이다."
+        ],
+        answer: 3,
+        explanation: "초과본인일부담금 제도는 일정 기간 동안 가입자가 부담한 본인일부부담금이 법에서 정한 상한액을 초과하면 그 초과분을 공단이 부담하거나 환급하는 제도이다.",
+        keywords: ["초과본인일부담금", "상한제", "환급"]
+      },
+      {
+        id: 22,
+        category: "국민건강보험법",
+        question: "건강보험 가입자의 자격 변동이 발생한 경우, 원칙적으로 몇 일 이내에 보험자에게 신고하여야 하는가?",
+        options: [
+          "7일 이내",
+          "10일 이내",
+          "14일 이내",
+          "30일 이내",
+          "90일 이내"
+        ],
+        answer: 3,
+        explanation: "가입자 자격 변동 신고는 원칙적으로 14일 이내에 하여야 한다.",
+        keywords: ["자격변동", "신고기한", "14일"]
+      }
+    ];
+
+    // ===== 상태 관리 및 게임 로직 =====
+    let mode = "quiz"; // "quiz" or "recall"
+    let currentIndex = 0;
+    let filteredQuestions = [...questionBank];
+    let score = 0;
+    let correctCount = 0;
+    let answeredCount = 0;
+    let combo = 0;
+    let bestCombo = 0;
+    let wrongNote = [];
+
+    const categorySelect = document.getElementById("categorySelect");
+    const categoryChip = document.getElementById("categoryChip");
+    const questionTextEl = document.getElementById("questionText");
+    const optionsListEl = document.getElementById("optionsList");
+    const qIndexEl = document.getElementById("qIndex");
+    const feedbackEl = document.getElementById("feedback");
+    const checkBtn = document.getElementById("checkBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const shuffleBtn = document.getElementById("shuffleBtn");
+    const statProgressEl = document.getElementById("statProgress");
+    const statCountEl = document.getElementById("statCount");
+    const statAccuracyEl = document.getElementById("statAccuracy");
+    const statScoreEl = document.getElementById("statScore");
+    const statComboEl = document.getElementById("statCombo");
+    const statBestComboEl = document.getElementById("statBestCombo");
+    const wrongListEl = document.getElementById("wrongList");
+    const modeQuizBtn = document.getElementById("modeQuiz");
+    const modeRecallBtn = document.getElementById("modeRecall");
+    const recallRow = document.getElementById("recallRow");
+    const recallInput = document.getElementById("recallInput");
+    const recallCheckBtn = document.getElementById("recallCheckBtn");
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function resetStats() {
+      score = 0;
+      correctCount = 0;
+      answeredCount = 0;
+      combo = 0;
+      bestCombo = 0;
+      wrongNote = [];
+      updateStats();
+      renderWrongList();
+    }
+
+    function applyFilter() {
+      const cat = categorySelect.value;
+      if (cat === "ALL") {
+        filteredQuestions = [...questionBank];
+        categoryChip.textContent = "전체 파트";
+      } else {
+        filteredQuestions = questionBank.filter(q => q.category === cat);
+        categoryChip.textContent = cat;
+      }
+      shuffleArray(filteredQuestions);
+      currentIndex = 0;
+      resetStats();
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      if (filteredQuestions.length === 0) {
+        questionTextEl.textContent = "해당 파트에 등록된 문제가 없습니다.";
+        optionsListEl.innerHTML = "";
+        qIndexEl.textContent = "문제 0 / 0";
+        feedbackEl.textContent = "";
+        checkBtn.disabled = true;
+        nextBtn.disabled = true;
+        return;
+      }
+      checkBtn.disabled = false;
+
+      const q = filteredQuestions[currentIndex];
+      qIndexEl.textContent = `문제 ${currentIndex + 1} / ${filteredQuestions.length}`;
+      questionTextEl.textContent = q.question;
+      feedbackEl.textContent = "";
+      feedbackEl.className = "";
+      nextBtn.disabled = true;
+
+      optionsListEl.innerHTML = "";
+      if (mode === "quiz") {
+        optionsListEl.style.display = "flex";
+        recallRow.style.display = "none";
+        q.options.forEach((opt, idx) => {
+          const li = document.createElement("li");
+          li.className = "option-item";
+          li.dataset.index = idx + 1;
+          li.innerHTML = `
+            <span class="option-label">${idx + 1}.</span>
+            <div class="option-text">
+              <label>
+                <input type="radio" name="option" value="${idx + 1}" />
+                ${opt}
+              </label>
+            </div>
+          `;
+          li.addEventListener("click", () => {
+            const radio = li.querySelector("input[type=radio]");
+            radio.checked = true;
+          });
+          optionsListEl.appendChild(li);
+        });
+      } else {
+        optionsListEl.style.display = "none";
+        recallRow.style.display = "flex";
+        recallInput.value = "";
+      }
+    }
+
+    function getSelectedOption() {
+      const radios = document.querySelectorAll("input[name='option']");
+      for (const r of radios) {
+        if (r.checked) return parseInt(r.value, 10);
+      }
+      return null;
+    }
+
+    function markOptions(correctIdx, chosenIdx) {
+      const items = optionsListEl.querySelectorAll(".option-item");
+      items.forEach(item => {
+        const idx = parseInt(item.dataset.index, 10);
+        item.classList.remove("correct", "wrong");
+        if (idx === correctIdx) {
+          item.classList.add("correct");
+        }
+        if (chosenIdx && idx === chosenIdx && chosenIdx !== correctIdx) {
+          item.classList.add("wrong");
+        }
+      });
+    }
+
+    function addWrongNote(question, chosen) {
+      if (wrongNote.find(w => w.id === question.id)) return;
+      wrongNote.push({
+        id: question.id,
+        category: question.category,
+        question: question.question,
+        correct: question.options ? question.options[question.answer - 1] : "",
+        explanation: question.explanation || "",
+        chosen
+      });
+      renderWrongList();
+    }
+
+    function renderWrongList() {
+      wrongListEl.innerHTML = "";
+      if (wrongNote.length === 0) {
+        wrongListEl.innerHTML =
+          '<div class="mini" style="margin-top:4px;">오답이 아직 없습니다. 틀린 문제들이 여기 쌓입니다.</div>';
+        return;
+      }
+      wrongNote.forEach((w, idx) => {
+        const div = document.createElement("div");
+        div.className = "wrong-item";
+        div.innerHTML = `
+          <div class="mini">#${idx + 1} · ${w.category}</div>
+          <div><strong>Q.</strong> ${w.question}</div>
+          <div><strong>정답:</strong> ${w.correct}</div>
+          <div class="mini"><strong>해설:</strong> ${w.explanation}</div>
+        `;
+        wrongListEl.appendChild(div);
+      });
+    }
+
+    function updateStats() {
+      const total = filteredQuestions.length || 1;
+      const progress = Math.round((currentIndex / total) * 100);
+      statProgressEl.textContent = `${progress}%`;
+      statCountEl.textContent = `${currentIndex} / ${total}문제`;
+
+      const accuracy = answeredCount === 0 ? 0 : Math.round((correctCount / answeredCount) * 100);
+      statAccuracyEl.textContent = `${accuracy}%`;
+      statScoreEl.textContent = `${score}점`;
+      statComboEl.textContent = `${combo}`;
+      statBestComboEl.textContent = `최고 ${bestCombo}연속`;
+    }
+
+    function checkQuizAnswer() {
+      const q = filteredQuestions[currentIndex];
+      const selected = getSelectedOption();
+      if (!selected) {
+        feedbackEl.textContent = "보기를 선택해줘!";
+        feedbackEl.className = "wrong";
+        return;
+      }
+      const isCorrect = selected === q.answer;
+      answeredCount++;
+      if (isCorrect) {
+        feedbackEl.textContent = "정답! 👍";
+        feedbackEl.className = "correct";
+        correctCount++;
+        combo++;
+        score += 5;
+        if (combo > bestCombo) bestCombo = combo;
+      } else {
+        feedbackEl.textContent = `오답 😢  정답은 ${q.answer}번: ${q.options[q.answer - 1]}`;
+        feedbackEl.className = "wrong";
+        score = Math.max(0, score - 1);
+        addWrongNote(q, q.options[selected - 1]);
+        combo = 0;
+      }
+      markOptions(q.answer, selected);
+      nextBtn.disabled = false;
+      updateStats();
+    }
+
+    function normalize(text) {
+      return text
+        .toString()
+        .trim()
+        .replace(/\s+/g, "")
+        .toLowerCase();
+    }
+
+    function checkRecallAnswer() {
+      const q = filteredQuestions[currentIndex];
+      const userInput = normalize(recallInput.value);
+      if (!userInput) {
+        feedbackEl.textContent = "키워드를 하나 이상 적어줘!";
+        feedbackEl.className = "wrong";
+        return;
+      }
+
+      let keyList = [];
+      if (q.keywords && q.keywords.length > 0) {
+        keyList = q.keywords;
+      } else if (q.options && q.options[q.answer - 1]) {
+        keyList = q.options[q.answer - 1]
+          .split(/[\s·,()]+/)
+          .filter(w => w.length >= 2);
+      }
+
+      const hit = keyList.some(k => userInput.includes(normalize(k)));
+
+      answeredCount++;
+      if (hit) {
+        feedbackEl.textContent = "키워드 인정! 정답 처리 ✅";
+        feedbackEl.className = "correct";
+        correctCount++;
+        combo++;
+        score += 5;
+        if (combo > bestCombo) bestCombo = combo;
+      } else {
+        feedbackEl.textContent =
+          "핵심 키워드가 부족해… 해설 보고 다시 외우자 😢";
+        feedbackEl.className = "wrong";
+        addWrongNote(q, userInput);
+        combo = 0;
+        score = Math.max(0, score - 1);
+      }
+      updateStats();
+      nextBtn.disabled = false;
+    }
+
+    function gotoNext() {
+      if (currentIndex < filteredQuestions.length - 1) {
+        currentIndex++;
+        renderQuestion();
+        updateStats();
+      } else {
+        feedbackEl.textContent = "모든 문제를 풀었어요! 🎉 파트 바꾸거나 다시 섞어서 복습해봐.";
+        feedbackEl.className = "correct";
+        nextBtn.disabled = true;
+      }
+    }
+
+    checkBtn.addEventListener("click", () => {
+      if (filteredQuestions.length === 0) {
+        feedbackEl.textContent = "등록된 문제가 없습니다.";
+        feedbackEl.className = "wrong";
+        return;
+      }
+      if (mode === "quiz") {
+        checkQuizAnswer();
+      } else {
+        checkRecallAnswer();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      gotoNext();
+    });
+
+    shuffleBtn.addEventListener("click", () => {
+      shuffleArray(filteredQuestions);
+      currentIndex = 0;
+      resetStats();
+      renderQuestion();
+    });
+
+    categorySelect.addEventListener("change", () => {
+      applyFilter();
+    });
+
+    modeQuizBtn.addEventListener("click", () => {
+      mode = "quiz";
+      modeQuizBtn.classList.add("active");
+      modeRecallBtn.classList.remove("active");
+      recallRow.style.display = "none";
+      optionsListEl.style.display = "flex";
+      renderQuestion();
+    });
+
+    modeRecallBtn.addEventListener("click", () => {
+      mode = "recall";
+      modeRecallBtn.classList.add("active");
+      modeQuizBtn.classList.remove("active");
+      renderQuestion();
+    });
+
+    recallCheckBtn.addEventListener("click", () => {
+      if (filteredQuestions.length === 0) {
+        feedbackEl.textContent = "등록된 문제가 없습니다.";
+        feedbackEl.className = "wrong";
+        return;
+      }
+      checkRecallAnswer();
+    });
+
+    recallInput?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        if (filteredQuestions.length === 0) {
+          feedbackEl.textContent = "등록된 문제가 없습니다.";
+          feedbackEl.className = "wrong";
+          return;
+        }
+        checkRecallAnswer();
+      }
+    });
+
+    // 초기 로딩
+    shuffleArray(filteredQuestions);
+    renderQuestion();
+    updateStats();
+    renderWrongList();
+  </script>
+</body>
+</html>
